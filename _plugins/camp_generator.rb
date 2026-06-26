@@ -90,6 +90,8 @@ module Jekyll
           'addr1'         => c['addr1'],
           'firstImageUrl' => c['firstImageUrl'],
           'sbrsCl'        => c['sbrsCl'],
+          'posblFcltyCl'  => c['posblFcltyCl'],
+          'themaEnvrnCl'  => c['themaEnvrnCl'],
           'animalCmgCl'   => c['animalCmgCl'],
           'resveCl'       => c['resveCl'],
           'mapX'          => c['mapX'],
