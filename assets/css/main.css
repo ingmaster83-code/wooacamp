@@ -1,3 +1,6 @@
+---
+---
+@charset "UTF-8";
 /* ===== 기본 리셋 ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
