@@ -1,0 +1,81 @@
+---
+layout: default
+---
+
+<div class="region-page">
+
+  <nav class="breadcrumb" aria-label="위치">
+    <a href="/">홈</a>
+    <span>›</span>
+    <a href="/type/">유형별</a>
+    <span>›</span>
+    <span>{{ page.type_name }}</span>
+  </nav>
+
+  <div class="region-page-header">
+    <h1>{{ page.type_icon }} {{ page.type_name }} 캠핑장</h1>
+    <p>{{ page.subtitle }}</p>
+  </div>
+
+  <!-- 필터 -->
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCamps('all', this)">전체</button>
+    <button class="filter-btn" onclick="filterCamps('pet', this)">🐾 반려동물 가능</button>
+    <button class="filter-btn" onclick="filterCamps('wifi', this)">📶 Wi-Fi</button>
+    <button class="filter-btn" onclick="filterCamps('elec', this)">⚡ 전기</button>
+  </div>
+
+  <p id="campCount" style="font-size:.87rem;color:#6B7280;margin-bottom:16px;"></p>
+
+  <div class="camp-grid" id="campGrid">
+    <p style="color:#6B7280;">로딩 중...</p>
+  </div>
+
+</div>
+
+<script>
+const TYPE_NAME = {{ page.type_name | jsonify }};
+let allCamps = [];
+
+(async () => {
+  const resp = await fetch('/search_index.json');
+  const all  = await resp.json();
+  allCamps = all.filter(c => c.induty && c.induty.includes(TYPE_NAME));
+  document.getElementById('campCount').textContent = `총 ${allCamps.length}개 캠핑장`;
+  renderCamps(allCamps);
+})();
+
+function filterCamps(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  let filtered = allCamps;
+  if (type === 'pet')  filtered = allCamps.filter(c => c.animalCmgCl && c.animalCmgCl !== '불가' && c.animalCmgCl !== '');
+  if (type === 'wifi') filtered = allCamps.filter(c => c.sbrsCl && (c.sbrsCl.includes('인터넷') || c.sbrsCl.includes('Wi-Fi') || c.sbrsCl.includes('와이파이')));
+  if (type === 'elec') filtered = allCamps.filter(c => c.sbrsCl && c.sbrsCl.includes('전기'));
+  document.getElementById('campCount').textContent = `총 ${filtered.length}개 캠핑장`;
+  renderCamps(filtered);
+}
+
+function renderCamps(camps) {
+  const grid = document.getElementById('campGrid');
+  if (camps.length === 0) {
+    grid.innerHTML = '<p style="color:#6B7280;grid-column:1/-1;">해당 조건의 캠핑장이 없습니다.</p>';
+    return;
+  }
+  grid.innerHTML = camps.map(c => {
+    const img = c.firstImageUrl
+      ? `<img class="camp-card-img" src="${c.firstImageUrl}" alt="${c.facltNm}" loading="lazy">`
+      : `<div class="camp-card-img-placeholder">⛺</div>`;
+    return `<a class="camp-card" href="/camp/${c.slug}/">
+      ${img}
+      <div class="camp-card-body">
+        <div class="camp-card-name">${c.facltNm}</div>
+        <div class="camp-card-loc">📍 ${c.doNm ? c.doNm.replace(/특별자치도|광역시|특별시|특별자치시/, '') : ''} ${c.sigunguNm || ''}</div>
+        <div class="camp-card-tags">
+          ${c.animalCmgCl && c.animalCmgCl !== '불가' && c.animalCmgCl !== '' ? `<span class="tag tag-pet">🐾 반려동물</span>` : ''}
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+}
+</script>

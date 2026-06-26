@@ -1,0 +1,180 @@
+---
+layout: default
+title: 우아캠프 - 전국 캠핑장 정보 검색
+description: 전국 캠핑장 위치, 시설, 예약 정보를 한눈에. 일반야영장, 자동차야영장, 글램핑, 카라반 정보 제공.
+---
+
+<!-- 히어로 & 검색 -->
+<div class="hero">
+  <h1>⛺ 전국 캠핑장 정보</h1>
+  <p>캠핑장명 또는 지역으로 검색하세요</p>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" class="search-input"
+           placeholder="예) 가평, 글램핑, 강원도..."
+           autocomplete="off" aria-label="캠핑장 검색">
+    <button class="search-btn" onclick="doSearch()">🔍 검색</button>
+  </div>
+</div>
+
+<!-- 검색 결과 -->
+<div id="search-results"></div>
+
+<!-- 지역별 찾기 -->
+<div class="section">
+  <h2 class="section-title">📍 지역별 캠핑장 찾기</h2>
+  <div class="region-grid">
+    <a href="/region/서울/" class="region-btn"><span class="region-icon">🏙️</span>서울<span class="region-count"></span></a>
+    <a href="/region/경기/" class="region-btn"><span class="region-icon">🌾</span>경기<span class="region-count"></span></a>
+    <a href="/region/인천/" class="region-btn"><span class="region-icon">⚓</span>인천<span class="region-count"></span></a>
+    <a href="/region/강원/" class="region-btn"><span class="region-icon">🏔️</span>강원<span class="region-count"></span></a>
+    <a href="/region/충북/" class="region-btn"><span class="region-icon">🌲</span>충북<span class="region-count"></span></a>
+    <a href="/region/충남/" class="region-btn"><span class="region-icon">🌊</span>충남<span class="region-count"></span></a>
+    <a href="/region/대전/" class="region-btn"><span class="region-icon">🏛️</span>대전<span class="region-count"></span></a>
+    <a href="/region/세종/" class="region-btn"><span class="region-icon">🌿</span>세종<span class="region-count"></span></a>
+    <a href="/region/전북/" class="region-btn"><span class="region-icon">🌾</span>전북<span class="region-count"></span></a>
+    <a href="/region/전남/" class="region-btn"><span class="region-icon">🐚</span>전남<span class="region-count"></span></a>
+    <a href="/region/광주/" class="region-btn"><span class="region-icon">🎨</span>광주<span class="region-count"></span></a>
+    <a href="/region/경북/" class="region-btn"><span class="region-icon">🍎</span>경북<span class="region-count"></span></a>
+    <a href="/region/경남/" class="region-btn"><span class="region-icon">🎋</span>경남<span class="region-count"></span></a>
+    <a href="/region/부산/" class="region-btn"><span class="region-icon">🌅</span>부산<span class="region-count"></span></a>
+    <a href="/region/대구/" class="region-btn"><span class="region-icon">🍑</span>대구<span class="region-count"></span></a>
+    <a href="/region/울산/" class="region-btn"><span class="region-icon">🏭</span>울산<span class="region-count"></span></a>
+    <a href="/region/제주/" class="region-btn"><span class="region-icon">🌺</span>제주<span class="region-count"></span></a>
+  </div>
+</div>
+
+<!-- 유형별 찾기 -->
+<div class="section" style="background:white;padding-top:40px;padding-bottom:40px;margin:0;">
+  <div style="max-width:960px;margin:0 auto;padding:0 20px;">
+    <h2 class="section-title">🏕️ 유형별 캠핑장</h2>
+    <div class="type-grid">
+      <a href="/type/일반야영장/" class="type-card">
+        <span class="type-icon">⛺</span>
+        <div class="type-name">일반야영장</div>
+        <div class="type-count" id="cnt-일반야영장"></div>
+      </a>
+      <a href="/type/자동차야영장/" class="type-card">
+        <span class="type-icon">🚗</span>
+        <div class="type-name">자동차야영장</div>
+        <div class="type-count" id="cnt-자동차야영장"></div>
+      </a>
+      <a href="/type/글램핑/" class="type-card">
+        <span class="type-icon">🛖</span>
+        <div class="type-name">글램핑</div>
+        <div class="type-count" id="cnt-글램핑"></div>
+      </a>
+      <a href="/type/카라반/" class="type-card">
+        <span class="type-icon">🚐</span>
+        <div class="type-name">카라반</div>
+        <div class="type-count" id="cnt-카라반"></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 인기 캠핑장 Top -->
+<div class="section">
+  <h2 class="section-title">🔥 최근 등록 캠핑장</h2>
+  <div class="camp-grid" id="recentCamps">
+    <p style="color:#6B7280;">로딩 중...</p>
+  </div>
+</div>
+
+<!-- Fuse.js 검색 -->
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script>
+let fuseIndex = null;
+let fuse = null;
+
+async function loadIndex() {
+  if (fuseIndex) return;
+  const resp = await fetch('/search_index.json');
+  fuseIndex = await resp.json();
+  fuse = new Fuse(fuseIndex, {
+    keys: ['facltNm', 'doNm', 'sigunguNm', 'addr1', 'induty', 'lineIntro'],
+    threshold: 0.35,
+    minMatchCharLength: 1,
+  });
+  updateCounts();
+  renderRecent();
+}
+
+function updateCounts() {
+  if (!fuseIndex) return;
+  // 지역 카운트는 JS로 동적 업데이트 가능하지만 생략 (정적 페이지 SEO 우선)
+  // 유형별 카운트
+  const types = ['일반야영장', '자동차야영장', '글램핑', '카라반'];
+  types.forEach(t => {
+    const cnt = fuseIndex.filter(c => c.induty && c.induty.includes(t)).length;
+    const el = document.getElementById('cnt-' + t);
+    if (el) el.textContent = cnt + '개';
+  });
+}
+
+function renderRecent() {
+  if (!fuseIndex) return;
+  const recent = fuseIndex
+    .filter(c => c.firstImageUrl)
+    .slice(0, 12);
+  document.getElementById('recentCamps').innerHTML = recent.map(campCard).join('');
+}
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) { document.getElementById('search-results').innerHTML = ''; return; }
+  loadIndex().then(() => {
+    const results = fuse ? fuse.search(q).slice(0, 20) : [];
+    const el = document.getElementById('search-results');
+    if (results.length === 0) {
+      el.innerHTML = '<p style="text-align:center;padding:20px;color:#6B7280;">검색 결과가 없습니다.</p>';
+      return;
+    }
+    el.innerHTML = `<div style="max-width:960px;margin:0 auto;padding:0 20px;">
+      <p style="padding:8px 0;font-size:.9rem;color:#6B7280;">"${q}" 검색 결과 ${results.length}개</p>
+      ${results.map(r => searchResultItem(r.item)).join('')}
+    </div>`;
+    el.scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
+function campCard(c) {
+  const img = c.firstImageUrl
+    ? `<img class="camp-card-img" src="${c.firstImageUrl}" alt="${c.facltNm}" loading="lazy">`
+    : `<div class="camp-card-img-placeholder">⛺</div>`;
+  return `<a class="camp-card" href="/camp/${c.slug}/">
+    ${img}
+    <div class="camp-card-body">
+      <div class="camp-card-name">${c.facltNm}</div>
+      <div class="camp-card-loc">📍 ${c.sigunguNm || c.doNm || ''}</div>
+      <div class="camp-card-tags">
+        ${c.induty ? `<span class="tag tag-type">${c.induty}</span>` : ''}
+        ${c.animalCmgCl && c.animalCmgCl !== '불가' ? `<span class="tag tag-pet">🐾</span>` : ''}
+      </div>
+    </div>
+  </a>`;
+}
+
+function searchResultItem(c) {
+  const img = c.firstImageUrl
+    ? `<img class="search-result-thumb" src="${c.firstImageUrl}" alt="${c.facltNm}" loading="lazy">`
+    : `<div class="search-result-thumb" style="background:#d1fae5;display:flex;align-items:center;justify-content:center;font-size:1.5rem;border-radius:6px;">⛺</div>`;
+  return `<div class="search-result-item">
+    <a href="/camp/${c.slug}/">
+      ${img}
+      <div>
+        <div class="search-result-name">${c.facltNm}</div>
+        <div class="search-result-loc">📍 ${c.doNm} ${c.sigunguNm || ''}</div>
+        ${c.induty ? `<span class="search-result-tag">${c.induty}</span>` : ''}
+      </div>
+    </a>
+  </div>`;
+}
+
+// 엔터키 검색
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+// 페이지 로드 시 인덱스 미리 로드
+loadIndex();
+</script>

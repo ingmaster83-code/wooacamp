@@ -1,0 +1,13 @@
+.env
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+Gemfile.lock
+*.log
+fetch_test.txt
+sample_fields.txt
+api_test*.txt
+_tmp_*.txt
+_tmp_*.py

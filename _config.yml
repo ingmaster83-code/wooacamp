@@ -1,0 +1,31 @@
+title: 우아캠프 - 전국 캠핑장 정보
+description: >-
+  전국 캠핑장 위치, 시설, 예약 정보를 한눈에. 일반야영장, 자동차야영장, 글램핑, 카라반까지
+  고캠핑 공공데이터 기반 신뢰할 수 있는 캠핑장 정보.
+url: "https://wooacamp.wooahouse.com"
+baseurl: ""
+lang: ko
+timezone: Asia/Seoul
+author: WooaHouse
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - scripts/
+  - "*.py"
+  - "*.log"
+  - "*.txt"
+  - README.md
+  - .gitignore
+  - vendor/
+  - manual/
+  - _rawdata/

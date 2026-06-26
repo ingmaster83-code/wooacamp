@@ -1,0 +1,241 @@
+---
+layout: default
+---
+
+<div class="camp-page">
+
+  <!-- 브레드크럼 -->
+  <nav class="breadcrumb" aria-label="위치">
+    <a href="/">홈</a>
+    <span>›</span>
+    <a href="/region/{{ page.doNm | uri_escape }}/">{{ page.doNm }}</a>
+    <span>›</span>
+    <a href="/region/{{ page.doNm | uri_escape }}/{{ page.sigunguNm | uri_escape }}/">{{ page.sigunguNm }}</a>
+    <span>›</span>
+    <span>{{ page.facltNm }}</span>
+  </nav>
+
+  <!-- 이미지 갤러리 -->
+  <div class="gallery" id="gallery">
+    {% if page.firstImageUrl and page.firstImageUrl != "" %}
+    <img class="gallery-main" id="galleryMain" src="{{ page.firstImageUrl }}" alt="{{ page.facltNm }} 캠핑장 사진" loading="eager">
+    {% else %}
+    <div class="gallery-placeholder">🏕️</div>
+    {% endif %}
+    {% if page.images and page.images.size > 1 %}
+    <div class="gallery-thumbs">
+      {% for img in page.images limit:8 %}
+      <img class="gallery-thumb {% if forloop.first %}active{% endif %}"
+           src="{{ img }}" alt="{{ page.facltNm }} 사진 {{ forloop.index }}"
+           loading="lazy" onclick="switchImage(this, '{{ img }}')">
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- 캠핑장 헤더 -->
+  <div class="camp-header">
+    <div class="camp-tags">
+      {% if page.induty and page.induty != "" %}
+      <span class="tag tag-type">{{ page.induty }}</span>
+      {% endif %}
+      {% if page.animalCmgCl and page.animalCmgCl != "" and page.animalCmgCl != "불가" %}
+      <span class="tag tag-pet">🐾 반려동물 {{ page.animalCmgCl }}</span>
+      {% endif %}
+    </div>
+    <h1 class="camp-title">{{ page.facltNm }}</h1>
+    {% if page.addr1 and page.addr1 != "" %}
+    <div class="camp-info-row">
+      <span class="camp-info-icon">📍</span>
+      <span>{{ page.addr1 }}{% if page.addr2 and page.addr2 != "" %} {{ page.addr2 }}{% endif %}</span>
+    </div>
+    {% endif %}
+    {% if page.tel and page.tel != "" %}
+    <div class="camp-info-row">
+      <span class="camp-info-icon">📞</span>
+      <a href="tel:{{ page.tel }}">{{ page.tel }}</a>
+    </div>
+    {% endif %}
+    {% if page.resveCl and page.resveCl != "" %}
+    <div class="camp-info-row">
+      <span class="camp-info-icon">🗓️</span>
+      <span>예약: {{ page.resveCl }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- 부대시설 배지 -->
+  {% if page.sbrsCl and page.sbrsCl != "" %}
+  <div class="facility-grid">
+    {% assign facilities = page.sbrsCl | split: "," %}
+    {% for f in facilities %}
+    {% assign fname = f | strip %}
+    {% if fname != "" %}
+    <span class="facility-badge">
+      {% if fname contains "전기" %}⚡{% elsif fname contains "인터넷" or fname contains "Wi-Fi" or fname contains "와이파이" %}📶{% elsif fname contains "화장실" %}🚻{% elsif fname contains "샤워" %}🚿{% elsif fname contains "장작" %}🪵{% elsif fname contains "마트" or fname contains "매점" %}🛒{% elsif fname contains "수영" %}🏊{% elsif fname contains "낚시" %}🎣{% else %}✓{% endif %}
+      {{ fname }}
+    </span>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- 광고 -->
+  <div class="ad-slot">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6464921081676309" data-ad-slot="7080296704" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <!-- 캠핑장 소개 -->
+  {% if page.intro and page.intro != "" %}
+  <div class="camp-section">
+    <h2>캠핑장 소개</h2>
+    <p>{{ page.intro }}</p>
+  </div>
+  {% elsif page.lineIntro and page.lineIntro != "" %}
+  <div class="camp-section">
+    <h2>캠핑장 소개</h2>
+    <p>{{ page.lineIntro }}</p>
+  </div>
+  {% endif %}
+
+  <!-- 운영 정보 -->
+  <div class="camp-section">
+    <h2>운영 정보</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:.92rem;">
+      {% if page.operPdCl and page.operPdCl != "" %}
+      <tr><td style="padding:8px 0;color:#6B7280;width:110px;">운영기간</td><td>{{ page.operPdCl }}</td></tr>
+      {% endif %}
+      {% if page.operDeCl and page.operDeCl != "" %}
+      <tr><td style="padding:8px 0;color:#6B7280;">운영요일</td><td>{{ page.operDeCl }}</td></tr>
+      {% endif %}
+      {% if page.facltDivNm and page.facltDivNm != "" %}
+      <tr><td style="padding:8px 0;color:#6B7280;">구분</td><td>{{ page.facltDivNm }}</td></tr>
+      {% endif %}
+      {% assign totalSites = page.gnrlSiteCo | plus: 0 | plus: page.autoSiteCo | plus: 0 | plus: page.glampSiteCo | plus: 0 | plus: page.caravSiteCo | plus: 0 %}
+      {% if page.gnrlSiteCo and page.gnrlSiteCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">일반야영</td><td>{{ page.gnrlSiteCo }}면</td></tr>{% endif %}
+      {% if page.autoSiteCo and page.autoSiteCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">자동차야영</td><td>{{ page.autoSiteCo }}면</td></tr>{% endif %}
+      {% if page.glampSiteCo and page.glampSiteCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">글램핑</td><td>{{ page.glampSiteCo }}면</td></tr>{% endif %}
+      {% if page.caravSiteCo and page.caravSiteCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">카라반</td><td>{{ page.caravSiteCo }}면</td></tr>{% endif %}
+    </table>
+  </div>
+
+  <!-- 예약 버튼 -->
+  <div class="camp-section">
+    {% if page.resveUrl and page.resveUrl != "" %}
+    <a href="{{ page.resveUrl }}" target="_blank" rel="noopener" class="reserve-btn">
+      🗓️ 예약하기 ({{ page.resveCl }})
+    </a>
+    {% else %}
+    <a href="https://www.gocamping.or.kr/uni/user/camp/selectCampList.do" target="_blank" rel="noopener" class="reserve-btn secondary">
+      🏕️ 고캠핑에서 예약 정보 보기
+    </a>
+    {% endif %}
+    {% if page.homepage and page.homepage != "" %}
+    <a href="{{ page.homepage }}" target="_blank" rel="noopener" class="reserve-btn secondary" style="margin-top:10px;">
+      🌐 공식 홈페이지
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- 주변 캠핑장 (JS로 동적 로드) -->
+  <div class="nearby-section" id="nearbySection" style="display:none">
+    <h2>🗺️ 주변 캠핑장</h2>
+    <div class="camp-grid" id="nearbyGrid"></div>
+  </div>
+
+  <!-- 같은 지역 캠핑장 -->
+  <div class="region-camps">
+    <h2>📍 {{ page.sigunguNm }} 다른 캠핑장</h2>
+    <div id="regionCampsGrid" class="camp-grid"></div>
+    <p style="margin-top:16px;">
+      <a href="/region/{{ page.doNm | uri_escape }}/{{ page.sigunguNm | uri_escape }}/">{{ page.sigunguNm }} 캠핑장 전체 보기 →</a>
+    </p>
+  </div>
+
+  <!-- Schema.org LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "{{ page.facltNm | escape }}",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "{{ page.addr1 | escape }}",
+      "addressCountry": "KR"
+    }{% if page.tel and page.tel != "" %},
+    "telephone": "{{ page.tel | escape }}"{% endif %}{% if page.firstImageUrl and page.firstImageUrl != "" %},
+    "image": "{{ page.firstImageUrl }}"{% endif %}{% if page.mapX and page.mapX != "" %},
+    "geo": {
+      "@type": "GeoCoordinates",
+      "longitude": {{ page.mapX }},
+      "latitude": {{ page.mapY }}
+    }{% endif %}{% if page.homepage and page.homepage != "" %},
+    "url": "{{ page.homepage | escape }}"{% endif %}
+  }
+  </script>
+
+</div>
+
+<script>
+// 갤러리 이미지 전환
+function switchImage(thumb, url) {
+  const main = document.getElementById('galleryMain');
+  if (main) main.src = url;
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+}
+
+// 주변 캠핑장 로드
+(async () => {
+  const mapX = {{ page.mapX | default: '0' }};
+  const mapY = {{ page.mapY | default: '0' }};
+  const currentId = '{{ page.contentId }}';
+  const currentRegion = {{ page.sigunguNm | jsonify }};
+  if (!mapX || !mapY) return;
+
+  try {
+    const resp = await fetch('/search_index.json');
+    const all = await resp.json();
+
+    // 같은 지역 캠핑장 (최대 6개)
+    const regionCamps = all
+      .filter(c => c.sigunguNm === currentRegion && c.contentId !== currentId)
+      .slice(0, 6);
+
+    if (regionCamps.length > 0) {
+      document.getElementById('regionCampsGrid').innerHTML = regionCamps.map(campCard).join('');
+    }
+
+    // 위치 기반 주변 캠핑장 (거리 계산)
+    function dist(x1, y1, x2, y2) {
+      return Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
+    }
+    const nearby = all
+      .filter(c => c.contentId !== currentId && c.mapX && c.mapY)
+      .map(c => ({...c, d: dist(mapX, mapY, parseFloat(c.mapX), parseFloat(c.mapY))}))
+      .filter(c => c.d < 0.2)
+      .sort((a,b) => a.d - b.d)
+      .slice(0, 4);
+
+    if (nearby.length > 0) {
+      document.getElementById('nearbyGrid').innerHTML = nearby.map(campCard).join('');
+      document.getElementById('nearbySection').style.display = 'block';
+    }
+  } catch(e) {}
+
+  function campCard(c) {
+    const img = c.firstImageUrl
+      ? `<img class="camp-card-img" src="${c.firstImageUrl}" alt="${c.facltNm}" loading="lazy">`
+      : `<div class="camp-card-img-placeholder">⛺</div>`;
+    return `<a class="camp-card" href="/camp/${c.slug}/">
+      ${img}
+      <div class="camp-card-body">
+        <div class="camp-card-name">${c.facltNm}</div>
+        <div class="camp-card-loc">📍 ${c.sigunguNm}</div>
+        <div class="camp-card-tags"><span class="tag tag-type">${c.induty || ''}</span></div>
+      </div>
+    </a>`;
+  }
+})();
+</script>

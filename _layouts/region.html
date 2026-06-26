@@ -1,0 +1,122 @@
+---
+layout: default
+---
+
+<div class="region-page">
+
+  <nav class="breadcrumb" aria-label="위치">
+    <a href="/">홈</a>
+    <span>›</span>
+    {% if page.sigungu %}
+    <a href="/region/{{ page.do_key }}/">{{ page.do_name }}</a>
+    <span>›</span>
+    <span>{{ page.sigungu }}</span>
+    {% else %}
+    <span>{{ page.do_name }} 캠핑장</span>
+    {% endif %}
+  </nav>
+
+  <div class="region-page-header">
+    <h1>🏕️ {{ page.title_h1 }}</h1>
+    <p>{{ page.subtitle }}</p>
+  </div>
+
+  <!-- 필터 -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all" onclick="filterCamps('all', this)">전체</button>
+    <button class="filter-btn" data-filter="일반야영장" onclick="filterCamps('일반야영장', this)">⛺ 일반야영장</button>
+    <button class="filter-btn" data-filter="자동차야영장" onclick="filterCamps('자동차야영장', this)">🚗 자동차야영장</button>
+    <button class="filter-btn" data-filter="글램핑" onclick="filterCamps('글램핑', this)">🛖 글램핑</button>
+    <button class="filter-btn" data-filter="카라반" onclick="filterCamps('카라반', this)">🚐 카라반</button>
+    <button class="filter-btn" data-filter="pet" onclick="filterCamps('pet', this)">🐾 반려동물</button>
+  </div>
+
+  <p id="campCount" style="font-size:.87rem;color:#6B7280;margin-bottom:16px;"></p>
+
+  <div class="camp-grid" id="campGrid">
+    <p style="color:#6B7280;">로딩 중...</p>
+  </div>
+
+  <!-- 하위 지역 링크 (시/도 페이지에서만) -->
+  {% if page.subregions %}
+  <div style="margin-top:48px;">
+    <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:16px;">시/군/구별 검색</h2>
+    <div class="region-grid">
+      {% for sub in page.subregions %}
+      <a href="/region/{{ page.do_key }}/{{ sub.name | uri_escape }}/" class="region-btn">
+        <span class="region-icon">📍</span>
+        {{ sub.name }}
+        <span class="region-count">{{ sub.count }}개</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+const DO_NAME   = {{ page.do_name | jsonify }};
+const SIGUNGU   = {{ page.sigungu | default: "" | jsonify }};
+let allCamps = [];
+
+(async () => {
+  const resp = await fetch('/search_index.json');
+  const all  = await resp.json();
+
+  allCamps = all.filter(c => {
+    if (SIGUNGU) return c.sigunguNm === SIGUNGU;
+    // 시/도 매핑 (약칭 → 전체명 포함)
+    const doMap = {
+      '서울': '서울특별시', '경기': '경기도', '인천': '인천광역시',
+      '강원': '강원특별자치도', '충북': '충청북도', '충남': '충청남도',
+      '대전': '대전광역시', '세종': '세종특별자치시', '전북': '전북특별자치도',
+      '전남': '전라남도', '광주': '광주광역시', '경북': '경상북도',
+      '경남': '경상남도', '부산': '부산광역시', '대구': '대구광역시',
+      '울산': '울산광역시', '제주': '제주특별자치도'
+    };
+    const fullName = doMap[DO_NAME] || DO_NAME;
+    return c.doNm === DO_NAME || c.doNm === fullName || c.doNm.includes(DO_NAME);
+  });
+
+  document.getElementById('campCount').textContent = `총 ${allCamps.length}개 캠핑장`;
+  renderCamps(allCamps);
+})();
+
+function filterCamps(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  let filtered = allCamps;
+  if (type === 'pet') {
+    filtered = allCamps.filter(c => c.animalCmgCl && c.animalCmgCl !== '불가' && c.animalCmgCl !== '');
+  } else if (type !== 'all') {
+    filtered = allCamps.filter(c => c.induty && c.induty.includes(type));
+  }
+  document.getElementById('campCount').textContent = `총 ${filtered.length}개 캠핑장`;
+  renderCamps(filtered);
+}
+
+function renderCamps(camps) {
+  const grid = document.getElementById('campGrid');
+  if (camps.length === 0) {
+    grid.innerHTML = '<p style="color:#6B7280;grid-column:1/-1;">해당 조건의 캠핑장이 없습니다.</p>';
+    return;
+  }
+  grid.innerHTML = camps.map(c => {
+    const img = c.firstImageUrl
+      ? `<img class="camp-card-img" src="${c.firstImageUrl}" alt="${c.facltNm}" loading="lazy">`
+      : `<div class="camp-card-img-placeholder">⛺</div>`;
+    return `<a class="camp-card" href="/camp/${c.slug}/">
+      ${img}
+      <div class="camp-card-body">
+        <div class="camp-card-name">${c.facltNm}</div>
+        <div class="camp-card-loc">📍 ${c.sigunguNm || ''}</div>
+        <div class="camp-card-tags">
+          ${c.induty ? `<span class="tag tag-type">${c.induty}</span>` : ''}
+          ${c.animalCmgCl && c.animalCmgCl !== '불가' && c.animalCmgCl !== '' ? `<span class="tag tag-pet">🐾</span>` : ''}
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+}
+</script>
