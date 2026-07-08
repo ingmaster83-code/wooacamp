@@ -59,6 +59,28 @@ layout: default
   </div>
   {% endif %}
 
+  <!-- 안내 텍스트 -->
+  <div style="margin-top:40px;background:#F9FAFB;border-radius:14px;padding:24px 28px;">
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:12px;">{{ page.do_name }}{% if page.sigungu %} {{ page.sigungu }}{% endif %} 캠핑장 이용 안내</h2>
+    <p style="color:#374151;line-height:1.8;font-size:.9375rem;margin-bottom:16px;">
+      {{ page.do_name }}{% if page.sigungu %} {{ page.sigungu }}{% endif %}의 캠핑장을 일반야영장, 자동차야영장, 글램핑, 카라반 등 유형별로 검색할 수 있습니다.
+      반려동물 동반 가능 캠핑장, 계곡·해변·숲속 등 입지별 특색 있는 캠핑장도 간편하게 찾아보세요.
+      모든 정보는 한국관광공사 고캠핑 공공데이터를 기반으로 제공되며, 예약은 각 캠핑장 또는 고캠핑(gocamping.or.kr)을 통해 할 수 있습니다.
+    </p>
+    <details style="margin-bottom:10px;">
+      <summary style="cursor:pointer;font-weight:600;padding:6px 0;">캠핑 예약은 어디서 하나요?</summary>
+      <p style="padding:6px 0 4px;color:#374151;line-height:1.7;">캠핑장 카드를 클릭하면 상세 정보 페이지로 이동하며, 예약 링크가 안내됩니다. 국립공원 캠핑장은 국립공원 예약시스템, 일반 캠핑장은 고캠핑(gocamping.or.kr) 또는 각 캠핑장 홈페이지에서 예약할 수 있습니다.</p>
+    </details>
+    <details style="margin-bottom:10px;">
+      <summary style="cursor:pointer;font-weight:600;padding:6px 0;">반려동물 동반 캠핑장을 찾으려면?</summary>
+      <p style="padding:6px 0 4px;color:#374151;line-height:1.7;">위의 '반려동물' 필터를 클릭하면 반려동물 동반 가능 캠핑장만 모아서 볼 수 있습니다. 단, 방문 전 해당 캠핑장에 세부 규정을 확인하시기 바랍니다.</p>
+    </details>
+    <details>
+      <summary style="cursor:pointer;font-weight:600;padding:6px 0;">글램핑과 카라반의 차이가 무엇인가요?</summary>
+      <p style="padding:6px 0 4px;color:#374151;line-height:1.7;">글램핑은 텐트와 실내 침구류 등이 갖춰진 프리미엄 야영 형태로, 별도 장비 없이 이용할 수 있습니다. 카라반은 이동식 주택형 캠핑카로, 욕실·취사 설비 등이 갖춰져 있어 편안한 캠핑을 즐길 수 있습니다.</p>
+    </details>
+  </div>
+
 </div>
 
 <script>
