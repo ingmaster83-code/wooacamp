@@ -130,6 +130,14 @@ def main():
         time.sleep(DELAY)
 
     # 최종 저장
+    if OUT_FILE.exists():
+        existing = json.loads(OUT_FILE.read_text(encoding="utf-8"))
+        if len(all_camps) < len(existing) * 0.5:
+            raise SystemExit(
+                f"수집 건수({len(all_camps)}건)가 기존 데이터({len(existing)}건)의 절반 미만입니다. "
+                "API 오류로 판단하여 저장을 중단합니다."
+            )
+
     OUT_FILE.write_text(
         json.dumps(all_camps, ensure_ascii=False, indent=2),
         encoding="utf-8"
