@@ -54,7 +54,7 @@ module Jekyll
     def build_title(camp)
       name = camp['facltNm'] || ''
       loc  = [camp['doNm'], camp['sigunguNm']].compact.join(' ')
-      "#{name} 위치 시설 예약 | 우아캠프"
+      "#{name} #{loc} 위치 시설 예약"
     end
 
     def build_desc(camp)

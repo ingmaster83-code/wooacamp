@@ -78,7 +78,7 @@ def main():
         do_dir.mkdir(exist_ok=True)
         page = f"""---
 layout: region
-title: {display} 캠핑장 | 우아캠프
+title: {display} 캠핑장
 description: {display} 캠핑장 {len(do_camps)}개 정보. 위치, 시설, 예약 정보를 확인하세요. 일반야영장, 자동차야영장, 글램핑, 카라반.
 do_name: {key}
 do_key: {key}
@@ -97,7 +97,7 @@ subregions:
             sg_dir.mkdir(exist_ok=True)
             sg_page = f"""---
 layout: region
-title: {sg} 캠핑장 | {display} | 우아캠프
+title: {sg} 캠핑장 | {display}
 description: {display} {sg} 캠핑장 {len(sg_camps)}개 정보. 위치, 시설, 예약 정보를 확인하세요.
 do_name: {key}
 do_key: {key}
