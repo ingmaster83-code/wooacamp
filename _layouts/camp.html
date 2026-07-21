@@ -39,8 +39,17 @@ layout: default
       {% if page.induty and page.induty != "" %}
       <span class="tag tag-type">{{ page.induty }}</span>
       {% endif %}
+      {% if page.lctCl and page.lctCl != "" %}
+      {% assign lct_items = page.lctCl | split: "," %}
+      {% for lct in lct_items %}
+      <span class="tag tag-env">{% if lct contains "해변" or lct contains "바다" %}🏖️{% elsif lct contains "강" %}🏞️{% elsif lct contains "산" %}⛰️{% elsif lct contains "숲" %}🌲{% elsif lct contains "계곡" %}🏕️{% elsif lct contains "섬" %}🏝️{% elsif lct contains "호수" %}💧{% else %}📍{% endif %} {{ lct | strip }}</span>
+      {% endfor %}
+      {% endif %}
       {% if page.animalCmgCl and page.animalCmgCl != "" and page.animalCmgCl != "불가" %}
       <span class="tag tag-pet">🐾 반려동물 {{ page.animalCmgCl }}</span>
+      {% endif %}
+      {% if page.insrncAt == "Y" %}
+      <span class="tag tag-safe">🛡️ 시설배상책임보험 가입</span>
       {% endif %}
     </div>
     <h1 class="camp-title">{{ page.facltNm }}</h1>
@@ -80,6 +89,41 @@ layout: default
   </div>
   {% endif %}
 
+  <!-- 주변 즐길거리 -->
+  {% if page.posblFcltyCl and page.posblFcltyCl != "" %}
+  <div class="camp-section">
+    <h2>🎯 주변 즐길거리</h2>
+    <div class="facility-grid">
+      {% assign activities = page.posblFcltyCl | split: "," %}
+      {% for a in activities %}
+      {% assign aname = a | strip %}
+      {% if aname != "" %}
+      <span class="facility-badge">
+        {% if aname contains "낚시" %}🎣{% elsif aname contains "물놀이" or aname contains "수영" %}🏊{% elsif aname contains "산책" %}🚶{% elsif aname contains "놀이" %}🎠{% elsif aname contains "수상레저" %}🚤{% elsif aname contains "해수욕" %}🏖️{% elsif aname contains "운동" %}⚽{% else %}✨{% endif %}
+        {{ aname }}
+      </span>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- 테마 포인트 -->
+  {% if page.themaEnvrnCl and page.themaEnvrnCl != "" %}
+  <div class="camp-section">
+    <h2>✨ 테마 포인트</h2>
+    <div class="facility-grid">
+      {% assign themas = page.themaEnvrnCl | split: "," %}
+      {% for t in themas %}
+      {% assign tname = t | strip %}
+      {% if tname != "" %}
+      <span class="facility-badge">{{ tname }}</span>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
   <!-- 광고 -->
   <div class="ad-slot">
     <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6464921081676309" data-ad-slot="7080296704" data-ad-format="auto" data-full-width-responsive="true"></ins>
@@ -96,6 +140,11 @@ layout: default
   <div class="camp-section">
     <h2>캠핑장 소개</h2>
     <p>{{ page.lineIntro }}</p>
+  </div>
+  {% elsif page.featureNm and page.featureNm != "" %}
+  <div class="camp-section">
+    <h2>캠핑장 소개</h2>
+    <p style="white-space:pre-line">{{ page.featureNm | escape }}</p>
   </div>
   {% endif %}
 
@@ -117,8 +166,36 @@ layout: default
       {% if page.autoSiteCo and page.autoSiteCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">자동차야영</td><td>{{ page.autoSiteCo }}면</td></tr>{% endif %}
       {% if page.glampSiteCo and page.glampSiteCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">글램핑</td><td>{{ page.glampSiteCo }}면</td></tr>{% endif %}
       {% if page.caravSiteCo and page.caravSiteCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">카라반</td><td>{{ page.caravSiteCo }}면</td></tr>{% endif %}
+      {% if page.brazierCl and page.brazierCl != "" %}<tr><td style="padding:8px 0;color:#6B7280;">화로대</td><td>{{ page.brazierCl }} 사용</td></tr>{% endif %}
+      {% if page.toiletCo and page.toiletCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">화장실</td><td>{{ page.toiletCo }}개소</td></tr>{% endif %}
+      {% if page.swrmCo and page.swrmCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">샤워장</td><td>{{ page.swrmCo }}개소</td></tr>{% endif %}
+      {% if page.wtrplCo and page.wtrplCo != "0" %}<tr><td style="padding:8px 0;color:#6B7280;">취사장</td><td>{{ page.wtrplCo }}개소</td></tr>{% endif %}
     </table>
   </div>
+
+  <!-- 대여 가능 장비 -->
+  {% if page.eqpmnLendCl and page.eqpmnLendCl != "" %}
+  <div class="camp-section">
+    <h2>🎒 대여 가능 장비</h2>
+    <div class="facility-grid">
+      {% assign lendables = page.eqpmnLendCl | split: "," %}
+      {% for l in lendables %}
+      {% assign lname = l | strip %}
+      {% if lname != "" %}
+      <span class="facility-badge">🎒 {{ lname }}</span>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- 오시는 길 -->
+  {% if page.direction and page.direction != "" %}
+  <div class="camp-section">
+    <h2>🚗 오시는 길</h2>
+    <p style="white-space:pre-line">{{ page.direction | escape }}</p>
+  </div>
+  {% endif %}
 
   <!-- 예약 버튼 -->
   <div class="camp-section">
