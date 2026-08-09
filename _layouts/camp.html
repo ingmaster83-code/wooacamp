@@ -237,6 +237,31 @@ layout: default
     </p>
   </div>
 
+  <!-- 최근 본 캠핑장 -->
+  <div class="nearby-section" id="recentSection" style="display:none">
+    <h2>🕑 최근 본 캠핑장</h2>
+    <div class="camp-grid" id="recentGrid"></div>
+  </div>
+
+  <!-- 이전/다음 캠핑장 -->
+  <div class="camp-prevnext" id="prevnextSection" style="display:none">
+    <a href="#" class="prevnext-btn prevnext-prev" id="prevBtn">
+      <span class="prevnext-label">◀ 이전 캠핑장</span>
+      <span class="prevnext-name" id="prevName"></span>
+    </a>
+    <a href="#" class="prevnext-btn prevnext-next" id="nextBtn">
+      <span class="prevnext-label">다음 캠핑장 ▶</span>
+      <span class="prevnext-name" id="nextName"></span>
+    </a>
+  </div>
+
+  <!-- 우아동네 교차링크 -->
+  <div class="crosslink-box">
+    <a href="https://wooatown.wooahouse.com/지역/{{ page.doNm | uri_escape }}.html" target="_blank" rel="noopener" class="crosslink-link">
+      🏠 {{ page.doNm }} 다른 생활정보 보기 (우아동네) →
+    </a>
+  </div>
+
   <!-- Schema.org LocalBusiness -->
   <script type="application/ld+json">
   {
@@ -293,6 +318,21 @@ function switchImage(thumb, url) {
       document.getElementById('regionCampsGrid').innerHTML = regionCamps.map(campCard).join('');
     }
 
+    // 이전/다음 캠핑장 (같은 시군구 내 이름순 정렬 후 순환)
+    const regionOrdered = all
+      .filter(c => c.sigunguNm === currentRegion)
+      .sort((a, b) => (a.facltNm || '').localeCompare(b.facltNm || '', 'ko'));
+    const curIdx = regionOrdered.findIndex(c => c.contentId === currentId);
+    if (curIdx !== -1 && regionOrdered.length > 1) {
+      const prevC = regionOrdered[(curIdx - 1 + regionOrdered.length) % regionOrdered.length];
+      const nextC = regionOrdered[(curIdx + 1) % regionOrdered.length];
+      document.getElementById('prevBtn').href = `/camp/${prevC.slug}/`;
+      document.getElementById('prevName').textContent = prevC.facltNm;
+      document.getElementById('nextBtn').href = `/camp/${nextC.slug}/`;
+      document.getElementById('nextName').textContent = nextC.facltNm;
+      document.getElementById('prevnextSection').style.display = 'grid';
+    }
+
     // 위치 기반 주변 캠핑장 (거리 계산)
     function dist(x1, y1, x2, y2) {
       return Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
@@ -323,5 +363,44 @@ function switchImage(thumb, url) {
       </div>
     </a>`;
   }
+})();
+</script>
+
+<script>
+// 최근 본 캠핑장 (localStorage)
+(() => {
+  const KEY = 'wooacamp_recent';
+  const currentId = {{ page.contentId | jsonify }};
+  const current = {
+    contentId: currentId,
+    facltNm: {{ page.facltNm | jsonify }},
+    sigunguNm: {{ page.sigunguNm | jsonify }},
+    slug: {{ page.slug | jsonify }},
+    firstImageUrl: {{ page.firstImageUrl | jsonify }},
+    induty: {{ page.induty | jsonify }}
+  };
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) {}
+
+  const others = list.filter(i => i.contentId !== currentId);
+  if (others.length > 0) {
+    document.getElementById('recentGrid').innerHTML = others.slice(0, 6).map(c => {
+      const img = c.firstImageUrl
+        ? `<img class="camp-card-img" src="${c.firstImageUrl}" alt="${c.facltNm}" loading="lazy">`
+        : `<div class="camp-card-img-placeholder">⛺</div>`;
+      return `<a class="camp-card" href="/camp/${c.slug}/">
+        ${img}
+        <div class="camp-card-body">
+          <div class="camp-card-name">${c.facltNm}</div>
+          <div class="camp-card-loc">📍 ${c.sigunguNm}</div>
+          <div class="camp-card-tags"><span class="tag tag-type">${c.induty || ''}</span></div>
+        </div>
+      </a>`;
+    }).join('');
+    document.getElementById('recentSection').style.display = 'block';
+  }
+
+  const updated = [current, ...others].slice(0, 10);
+  try { localStorage.setItem(KEY, JSON.stringify(updated)); } catch (e) {}
 })();
 </script>
