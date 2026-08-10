@@ -9,9 +9,9 @@ layout: default
   <nav class="breadcrumb" aria-label="위치">
     <a href="/">홈</a>
     <span>›</span>
-    <a href="/region/{{ page.doNm | uri_escape }}/">{{ page.doNm }}</a>
+    <a href="/region/{{ page.doShort | uri_escape }}/">{{ page.doNm }}</a>
     <span>›</span>
-    <a href="/region/{{ page.doNm | uri_escape }}/{{ page.sigunguNm | uri_escape }}/">{{ page.sigunguNm }}</a>
+    <a href="/region/{{ page.doShort | uri_escape }}/{{ page.sigunguNm | uri_escape }}/">{{ page.sigunguNm }}</a>
     <span>›</span>
     <span>{{ page.facltNm }}</span>
   </nav>
@@ -233,7 +233,7 @@ layout: default
     <h2>📍 {{ page.sigunguNm }} 다른 캠핑장</h2>
     <div id="regionCampsGrid" class="camp-grid"></div>
     <p style="margin-top:16px;">
-      <a href="/region/{{ page.doNm | uri_escape }}/{{ page.sigunguNm | uri_escape }}/">{{ page.sigunguNm }} 캠핑장 전체 보기 →</a>
+      <a href="/region/{{ page.doShort | uri_escape }}/{{ page.sigunguNm | uri_escape }}/">{{ page.sigunguNm }} 캠핑장 전체 보기 →</a>
     </p>
   </div>
 
@@ -257,8 +257,8 @@ layout: default
 
   <!-- 우아동네 교차링크 -->
   <div class="crosslink-box">
-    <a href="https://wooatown.wooahouse.com/지역/{{ page.doNm | uri_escape }}.html" target="_blank" rel="noopener" class="crosslink-link">
-      🏠 {{ page.doNm }} 다른 생활정보 보기 (우아동네) →
+    <a href="https://wooatown.wooahouse.com/지역/{{ page.doShort | uri_escape }}.html" target="_blank" rel="noopener" class="crosslink-link">
+      🏠 {{ page.doShort }} 다른 생활정보 보기 (우아동네) →
     </a>
   </div>
 
