@@ -34,24 +34,29 @@ def fetch_based_list(page: int, rows: int = 100) -> dict:
     return json.loads(resp.content.decode("utf-8"))
 
 
-def fetch_image_list(content_id: str) -> list:
+def fetch_image_list(content_id: str, retries: int = 3) -> list:
     url = f"{BASE_URL}/imageList"
     params = {**COMMON_PARAMS, "contentId": content_id, "numOfRows": 10, "pageNo": 1}
     query = "&".join(f"{k}={v}" for k, v in params.items())
-    resp = requests.get(f"{url}?{query}", timeout=30)
-    if resp.status_code != 200 or not resp.text.strip():
-        return []
-    try:
-        data = json.loads(resp.content.decode("utf-8"))
-        items = data.get("response", {}).get("body", {}).get("items", {})
-        if not items or items == "":
-            return []
-        item = items.get("item", [])
-        if isinstance(item, dict):
-            item = [item]
-        return [i.get("imageUrl", "") for i in item if i.get("imageUrl")]
-    except Exception:
-        return []
+    for attempt in range(retries):
+        try:
+            resp = requests.get(f"{url}?{query}", timeout=30)
+            if resp.status_code != 200 or not resp.text.strip():
+                return []
+            data = json.loads(resp.content.decode("utf-8"))
+            items = data.get("response", {}).get("body", {}).get("items", {})
+            if not items or items == "":
+                return []
+            item = items.get("item", [])
+            if isinstance(item, dict):
+                item = [item]
+            return [i.get("imageUrl", "") for i in item if i.get("imageUrl")]
+        except Exception as e:
+            if attempt == retries - 1:
+                print(f"  [imageList 실패, 건너뜀] contentId={content_id}: {e}")
+                return []
+            time.sleep(3 * (attempt + 1))
+    return []
 
 
 def make_slug(content_id: str, name: str) -> str:
