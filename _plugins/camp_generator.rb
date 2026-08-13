@@ -64,15 +64,23 @@ module Jekyll
 
     private
 
+    # 검색결과 title이 영문 병기 괄호 때문에 길어져서 "위치 시설 예약"이 잘려나가는 문제 방지.
+    # 예: "럭스피아 캠핑장(LUXPIA CAMPGROUND)" -> "럭스피아 캠핑장"
+    def display_name(faclt_nm)
+      name = (faclt_nm || '').to_s
+      stripped = name.sub(/\s*\(.*\)\s*\z/, '').strip
+      stripped.empty? ? name : stripped
+    end
+
     def build_title(camp)
-      name = camp['facltNm'] || ''
+      name = display_name(camp['facltNm'])
       loc  = [camp['doNm'], camp['sigunguNm']].compact.join(' ')
       "#{name} #{loc} 위치 시설 예약"
     end
 
     def build_desc(camp)
       return camp['seoDescription'] if camp['seoDescription'].to_s.length > 10
-      name   = camp['facltNm'] || ''
+      name   = display_name(camp['facltNm'])
       loc    = [camp['doNm'], camp['sigunguNm']].compact.join(' ')
       induty = camp['induty'] || ''
       intro  = (camp['lineIntro'] || '').strip[0, 60]
