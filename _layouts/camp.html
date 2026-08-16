@@ -140,17 +140,17 @@ layout: default
   <!-- 캠핑장 소개 -->
   {% if page.intro and page.intro != "" %}
   <div class="camp-section">
-    <h2>캠핑장 소개</h2>
+    <h2>시설 소개</h2>
     <p>{{ page.intro }}</p>
   </div>
   {% elsif page.lineIntro and page.lineIntro != "" %}
   <div class="camp-section">
-    <h2>캠핑장 소개</h2>
+    <h2>시설 소개</h2>
     <p>{{ page.lineIntro }}</p>
   </div>
   {% elsif page.featureNm and page.featureNm != "" %}
   <div class="camp-section">
-    <h2>캠핑장 소개</h2>
+    <h2>시설 소개</h2>
     <p style="white-space:pre-line">{{ page.featureNm | escape }}</p>
   </div>
   {% endif %}

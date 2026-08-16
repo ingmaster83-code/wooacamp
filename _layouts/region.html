@@ -35,6 +35,7 @@ layout: default
     <button class="filter-btn" data-filter="자동차야영장" onclick="filterCamps('자동차야영장', this)">🚗 자동차야영장</button>
     <button class="filter-btn" data-filter="글램핑" onclick="filterCamps('글램핑', this)">🛖 글램핑</button>
     <button class="filter-btn" data-filter="카라반" onclick="filterCamps('카라반', this)">🚐 카라반</button>
+    <button class="filter-btn" data-filter="청소년" onclick="filterCamps('청소년', this)">🧑‍🎓 청소년수련시설</button>
     <button class="filter-btn" data-filter="pet" onclick="filterCamps('pet', this)">🐾 반려동물</button>
   </div>
 
@@ -110,7 +111,7 @@ let allCamps = [];
     return c.doNm === DO_NAME || c.doNm === fullName || c.doNm.includes(DO_NAME);
   });
 
-  document.getElementById('campCount').textContent = `총 ${allCamps.length}개 캠핑장`;
+  document.getElementById('campCount').textContent = `총 ${allCamps.length}곳`;
   renderCamps(allCamps);
 })();
 
@@ -123,7 +124,7 @@ function filterCamps(type, btn) {
   } else if (type !== 'all') {
     filtered = allCamps.filter(c => c.induty && c.induty.includes(type));
   }
-  document.getElementById('campCount').textContent = `총 ${filtered.length}개 캠핑장`;
+  document.getElementById('campCount').textContent = `총 ${filtered.length}곳`;
   renderCamps(filtered);
 }
 

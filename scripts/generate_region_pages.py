@@ -76,13 +76,15 @@ def main():
         # 시/도 index 페이지
         do_dir = REGION / key
         do_dir.mkdir(exist_ok=True)
+        do_teen_cnt = sum(1 for c in do_camps if str(c.get('induty', '')).startswith('청소년'))
+        do_label = "캠핑장·청소년수련시설" if do_teen_cnt else "캠핑장"
         page = f"""---
 layout: region
-title: {display} 캠핑장
-description: {display} 캠핑장 {len(do_camps)}개 정보. 위치, 시설, 예약 정보를 확인하세요. 일반야영장, 자동차야영장, 글램핑, 카라반.
+title: {display} {do_label}
+description: {display} {do_label} {len(do_camps)}개 정보. 위치, 시설, 예약 정보를 확인하세요. 일반야영장, 자동차야영장, 글램핑, 카라반.
 do_name: {key}
 do_key: {key}
-title_h1: {emoji} {display} 캠핑장 {len(do_camps)}개
+title_h1: {emoji} {display} {do_label} {len(do_camps)}개
 subtitle: {display} 지역 캠핑장을 유형별, 시설별로 검색하세요.
 subregions:
 {chr(10).join(f"  - name: {s['name']}" + chr(10) + f"    count: {s['count']}" for s in subregions)}
@@ -95,14 +97,16 @@ subregions:
         for sg, sg_camps in sg_groups.items():
             sg_dir = do_dir / sg
             sg_dir.mkdir(exist_ok=True)
+            sg_teen_cnt = sum(1 for c in sg_camps if str(c.get('induty', '')).startswith('청소년'))
+            sg_label = "캠핑장·청소년수련시설" if sg_teen_cnt else "캠핑장"
             sg_page = f"""---
 layout: region
-title: {sg} 캠핑장 | {display}
-description: {display} {sg} 캠핑장 {len(sg_camps)}개 정보. 위치, 시설, 예약 정보를 확인하세요.
+title: {sg} {sg_label} | {display}
+description: {display} {sg} {sg_label} {len(sg_camps)}개 정보. 위치, 시설, 예약 정보를 확인하세요.
 do_name: {key}
 do_key: {key}
 sigungu: {sg}
-title_h1: 📍 {sg} 캠핑장 {len(sg_camps)}개
+title_h1: 📍 {sg} {sg_label} {len(sg_camps)}개
 subtitle: {display} {sg} 지역 캠핑장을 유형별, 시설별로 검색하세요.
 ---
 """
