@@ -29,9 +29,16 @@ def fetch_based_list(page: int, rows: int = 100) -> dict:
     url = f"{BASE_URL}/basedList"
     params = {**COMMON_PARAMS, "numOfRows": rows, "pageNo": page}
     query = "&".join(f"{k}={v}" for k, v in params.items())
-    resp = requests.get(f"{url}?{query}", timeout=30)
-    resp.raise_for_status()
-    return json.loads(resp.content.decode("utf-8"))
+    for attempt in range(4):   # data.go.kr 가 간헐적으로 타임아웃 → 일시 오류 한 번에 주간 갱신이 통째로 실패하지 않도록 재시도
+        try:
+            resp = requests.get(f"{url}?{query}", timeout=30)
+            resp.raise_for_status()
+            return json.loads(resp.content.decode("utf-8"))
+        except (requests.exceptions.RequestException, ValueError) as e:
+            if attempt == 3:
+                raise
+            print(f"  [basedList 재시도 {attempt + 1}] page={page}: {e}")
+            time.sleep(5 * (2 ** attempt))
 
 
 def fetch_image_list(content_id: str, retries: int = 3) -> list:
